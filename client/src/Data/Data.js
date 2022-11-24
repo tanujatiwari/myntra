@@ -538,7 +538,7 @@ export const sidebar = [
         ],
       },
       {
-        name1: "         Sports & Active Wear",
+        name1: "Sports & Active Wear",
         subField1: [
           { name2: "Clothing" },
           { name2: "Footwear" },
@@ -547,7 +547,7 @@ export const sidebar = [
         ],
       },
       {
-        name1: "                                Lingerie & Sleepwear",
+        name1: "Lingerie & Sleepwear",
         subField1: [
           { name2: "Bra" },
           { name2: "Briefs" },
@@ -685,12 +685,12 @@ export const sidebar = [
         display: "none",
       },
       {
-        name1: "  Personal care",
+        name1: "Personal care",
         subField1: [{ name2: "" }],
         display: "none",
       },
       {
-        name1: "     Kids Accessories",
+        name1: "Kids Accessories",
         subField1: [
           { name2: "Bags & Backpacks" },
           { name2: "Watches" },
@@ -720,7 +720,7 @@ export const sidebar = [
     name: "  Home & Living",
     subField: [
       {
-        name1: "      Bed Linen & Furnishing",
+        name1: "Bed Linen & Furnishing",
         subField1: [
           { name2: "Bed Runners" },
           { name2: "Mattress Protectors" },
