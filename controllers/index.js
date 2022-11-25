@@ -1,6 +1,9 @@
-module.exports.home = (req, res, next) => {
+const query = require('../dbHelper')
+
+module.exports.home = async (req, res, next) => {
     try {
-        res.json({ "message": 'Initial proj' })
+        const data = await query.findData()
+        res.json(data)
     }
     catch (err) {
         next(err)
