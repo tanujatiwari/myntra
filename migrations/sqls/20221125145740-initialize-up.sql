@@ -107,7 +107,7 @@ create table product_variants(
     price integer not null,
     product_id uuid,
     created_at timestamp with time zone default now(),
-    archived_at timestamp with time zone default null,
+    archived_at timestamp with time zone default nullb,
     foreign key(product_id) references products(id)
 );
 
