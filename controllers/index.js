@@ -6,7 +6,7 @@ const client = require('../services/messaging')
 module.exports.login = async (req, res, next) => {
     try {
         const { mobile } = req.body;
-        //check if user exists
+        //check if user exists`
         const userData = await query.checkUserExists(mobile)
         if (!userData) {
             const err = new Error('Cannot fetch user details from database')
@@ -32,7 +32,6 @@ module.exports.login = async (req, res, next) => {
                 to: `+91${mobile}`,
                 from: process.env.TWILIO_PHONE,
             })
-            .then((message) => console.log(message.sid));
 
         res.json({
             "message": `otp successfully sent to ${mobile}`,
@@ -47,7 +46,20 @@ module.exports.login = async (req, res, next) => {
 module.exports.otplogin = async (req, res, next) => {
     try {
         const { mobile, otp } = req.body;
-        
+        let response = {};
+        //fetch mobile from redis and match otp
+        const allKeys = await redis.keys(`${mobile}:*`)
+        for (let i = 0; i < allKeys.length; i++) {
+            let value = await redis.get(allKeys[i])
+            if (Number(value) === otp) {
+                response.message = 'Mobile number verified'
+            }
+        }
+        if (!response.message) {
+            res.status(401)
+            response.error = 'Invalid otp'
+        }
+        res.json(response)
     }
     catch (err) {
         next(err)
