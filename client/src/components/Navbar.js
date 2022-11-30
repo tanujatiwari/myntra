@@ -4,6 +4,7 @@ import logo from "./images/myntra.png";
 import app from "./images/downloadApp.jpeg";
 import Accordion from "react-bootstrap/Accordion";
 import { search, sidebar, Deals } from "../Data/Data";
+import loginImg from "./images/loginSignUp.webp";
 
 function Navbar() {
   const [isactive, setActive] = useState(false);
@@ -11,6 +12,20 @@ function Navbar() {
   const [heading, setHeading] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBar, setSearchBar] = useState(false);
+
+  const slideNav = () => {
+    var x = document.getElementById("navbar");
+    if (window.scrollY >= 100) {
+      if (x.classList == "active") {
+        x.classList.remove("active");
+      } else {
+        x.classList.add("active");
+      }
+    } else {
+      x.classList.remove("active");
+    }
+  };
+  window.addEventListener("scroll", slideNav);
 
   useEffect(() => {
     const changeNav = () => {
@@ -31,11 +46,13 @@ function Navbar() {
     window.scroll(0, 0);
     document.getElementById("backdrop").style.display = "block";
     document.getElementById("backdrop").style.zIndex = "7";
+    document.getElementById("header").style.position = "unset";
     document.body.style.overflowY = "hidden";
     setShow(true);
   };
   const closeDrawer = () => {
     document.getElementById("backdrop").style.display = "none";
+    document.getElementById("header").style.position = "sticky";
     document.body.style.overflowY = "auto";
     setShow(false);
   };
@@ -45,13 +62,18 @@ function Navbar() {
     setSearchTerm(e.target.value);
   };
   return (
-    <section id="navbar">
+    <section
+      className=""
+      id="header"
+      style={{ zIndex: "6", top: "0", position: "sticky" }}
+    >
       {!isactive ? (
         <nav
-          className="navbar navbar-expand-lg fixed-top bg-white p-0 m-0 px-lg-5 px-md-4"
-          style={{ boxShadow: "0 4px 12px 0 rgb(0 0 0 / 5%)", zIndex: "6" }}
+          id="navbar"
+          className="navbar navbar-expand-lg bg-white p-0 m-0 px-lg-5 px-md-4"
+          style={{ boxShadow: "0 4px 12px 0 rgb(0 0 0 / 5%)" }}
         >
-          <div className="navbar-nav w-100 py-lg-3 py-2 px-3">
+          <div className="navbar-nav w-100 px-3">
             <div className="align-items-center d-flex">
               <NavLink to="/">
                 <img
@@ -83,7 +105,8 @@ function Navbar() {
               >
                 <li
                   style={{ width: "fit-content", fontSize: "15px" }}
-                  className="nav-item px-2 py-2"
+                  className="nav-item px-2 py-lg-0 py-2 align-items-center d-lg-flex"
+                  id="men"
                   onMouseOver={() =>
                     (document.getElementById("backdrop").style.display =
                       "block")
@@ -95,6 +118,14 @@ function Navbar() {
                   <NavLink
                     to="/"
                     className="nav-link text-dark"
+                    onMouseOver={() =>
+                      (document.getElementById("men").style.borderBottom =
+                        "4px solid #ee5f73")
+                    }
+                    onMouseLeave={() =>
+                      (document.getElementById("men").style.borderBottom =
+                        "none")
+                    }
                     style={{ fontWeight: "600" }}
                   >
                     MEN
@@ -107,10 +138,7 @@ function Navbar() {
                           <div className="text-danger">
                             <div style={{ fontWeight: "500" }}>Topwear</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>T-Shirts</li>
                             <li>Casual Shirts</li>
                             <li>Formal Shirts</li>
@@ -126,10 +154,7 @@ function Navbar() {
                               Indian & festive Wear
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Kurtas & Kurta Sets</li>
                             <li>Sherwanis</li>
                             <li>Nehru Jackets</li>
@@ -146,10 +171,7 @@ function Navbar() {
                           <div className="text-danger">
                             <div style={{ fontWeight: "500" }}>Bottomwear</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Jeans</li>
                             <li>Casual Trouser</li>
                             <li>Formal Trouser</li>
@@ -162,10 +184,7 @@ function Navbar() {
                               Innerwear & Sleepwear
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Briefs & Trunks</li>
                             <li>Boxers</li>
                             <li>Vests</li>
@@ -180,10 +199,7 @@ function Navbar() {
                           <div className="text-danger">
                             <div style={{ fontWeight: "500" }}>Footwear</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Casual Shoes</li>
                             <li>Sports Shoes</li>
                             <li>Formal Shoes</li>
@@ -213,10 +229,7 @@ function Navbar() {
                               Fashion Accessories
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Wallets</li>
                             <li>Belts</li>
                             <li>Perfumes & Body Mists</li>
@@ -249,7 +262,8 @@ function Navbar() {
 
                 <li
                   style={{ width: "fit-content", fontSize: "15px" }}
-                  className="nav-item px-2 py-2"
+                  className="nav-item px-2 py-lg-0 py-2 align-items-center d-lg-flex"
+                  id="women"
                   onMouseOver={() =>
                     (document.getElementById("backdrop").style.display =
                       "block")
@@ -259,9 +273,17 @@ function Navbar() {
                   }
                 >
                   <NavLink
-                    to="/myntra"
+                    to="/"
                     className="nav-link text-dark"
                     style={{ fontWeight: "600" }}
+                    onMouseOver={() =>
+                      (document.getElementById("women").style.borderBottom =
+                        "4px solid #fb56c1")
+                    }
+                    onMouseLeave={() =>
+                      (document.getElementById("women").style.borderBottom =
+                        "none")
+                    }
                   >
                     WOMEN
                   </NavLink>
@@ -274,10 +296,7 @@ function Navbar() {
                               Indian & Fusion Wear
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Kurtas & Suits</li>
                             <li>Kurtis, Tunics & Tops</li>
                             <li>Sarees</li>
@@ -313,10 +332,7 @@ function Navbar() {
                               Western Wear
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Dresses</li>
                             <li>Tops</li>
                             <li>Tshirts</li>
@@ -347,10 +363,7 @@ function Navbar() {
                             <div style={{ fontWeight: "500" }}>Footwear</div>
                           </div>
 
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Flats</li>
                             <li>Casual Shoes</li>
                             <li>Heels</li>
@@ -363,10 +376,7 @@ function Navbar() {
                               Sports & Active Wear
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Clothing</li>
                             <li>Footwear</li>
                             <li>Sports Accessories</li>
@@ -379,10 +389,7 @@ function Navbar() {
                               Lingerie & Sleepwear
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Bra</li>
                             <li>Briefs</li>
                             <li>Shapewear</li>
@@ -396,10 +403,7 @@ function Navbar() {
                               Beauty & Personal Care
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Makeup</li>
                             <li>Skincare</li>
                             <li>Premium Beauty</li>
@@ -411,10 +415,7 @@ function Navbar() {
                           <div className="" style={{ color: "magenta" }}>
                             <div style={{ fontWeight: "500" }}>Gadgets</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Smart Wearables</li>
                             <li>Fitness Gadgets</li>
                             <li>Headphones</li>
@@ -424,10 +425,7 @@ function Navbar() {
                           <div className="" style={{ color: "magenta" }}>
                             <div style={{ fontWeight: "500" }}>Jewellery</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Fashion Jewellery</li>
                             <li>Fine Jewellery</li>
                             <li>Earings</li>
@@ -453,7 +451,8 @@ function Navbar() {
 
                 <li
                   style={{ width: "fit-content", fontSize: "15px" }}
-                  className="nav-item px-2 py-2"
+                  className="nav-item px-2 py-lg-0 py-2 align-items-center d-lg-flex"
+                  id="kids"
                   onMouseOver={() =>
                     (document.getElementById("backdrop").style.display =
                       "block")
@@ -466,6 +465,14 @@ function Navbar() {
                     to="/"
                     className="nav-link text-dark"
                     style={{ fontWeight: "600" }}
+                    onMouseOver={() =>
+                      (document.getElementById("kids").style.borderBottom =
+                        "4px solid #f26a10")
+                    }
+                    onMouseLeave={() =>
+                      (document.getElementById("kids").style.borderBottom =
+                        "none")
+                    }
                   >
                     KIDS
                   </NavLink>
@@ -478,10 +485,7 @@ function Navbar() {
                               Boys Clothing
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>T-Shirts</li>
                             <li>Shirts</li>
                             <li>Shorts</li>
@@ -509,10 +513,7 @@ function Navbar() {
                               Girls Clothing
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Dresses</li>
                             <li>Tops</li>
                             <li>Tshirts</li>
@@ -535,10 +536,7 @@ function Navbar() {
                             <div style={{ fontWeight: "500" }}>Footwear</div>
                           </div>
 
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Casual Shoes</li>
                             <li>FlipFlops</li>
                             <li>Sports Shoes</li>
@@ -552,10 +550,7 @@ function Navbar() {
                           <div className="" style={{ color: "orangered" }}>
                             <div style={{ fontWeight: "500" }}>Toys</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Learning & Development</li>
                             <li>Activity Toys</li>
                             <li>Soft Toys</li>
@@ -566,10 +561,7 @@ function Navbar() {
                           <div className="" style={{ color: "orangered" }}>
                             <div style={{ fontWeight: "500" }}>Infants</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Bodysuits</li>
                             <li>Rompers & Sleepsuits</li>
                             <li>Clothing Sets</li>
@@ -595,10 +587,7 @@ function Navbar() {
                               Kids Accessories
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Bags & Backpacks</li>
                             <li>Watches</li>
                             <li>Jewellery & Hair Accessory</li>
@@ -610,10 +599,7 @@ function Navbar() {
                           <div className="" style={{ color: "orangered" }}>
                             <div style={{ fontWeight: "500" }}>Brands</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>H&M</li>
                             <li>Max Kids</li>
                             <li>Pantaloons</li>
@@ -631,7 +617,8 @@ function Navbar() {
 
                 <li
                   style={{ width: "fit-content", fontSize: "15px" }}
-                  className="nav-item px-2 py-2"
+                  className="nav-item px-2 py-lg-0 py-2 align-items-center d-lg-flex"
+                  id="h&l"
                   onMouseOver={() =>
                     (document.getElementById("backdrop").style.display =
                       "block")
@@ -642,8 +629,16 @@ function Navbar() {
                 >
                   <NavLink
                     to="/"
-                    className="nav-link text-dark"
-                    style={{ fontWeight: "600" }}
+                    className="nav-link text-dark homeLiving"
+                    style={{ fontWeight: "600", width: "130px" }}
+                    onMouseOver={() =>
+                      (document.getElementById("h&l").style.borderBottom =
+                        "4px solid #f2c210")
+                    }
+                    onMouseLeave={() =>
+                      (document.getElementById("h&l").style.borderBottom =
+                        "none")
+                    }
                   >
                     HOME & LIVING
                   </NavLink>
@@ -657,10 +652,7 @@ function Navbar() {
                               Bed Linen & Furnishing
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Bed Runners</li>
                             <li>Mattress Protectors</li>
                             <li>Bedsheets</li>
@@ -675,10 +667,7 @@ function Navbar() {
                           <div className="" style={{ color: "#e7bc00" }}>
                             <div style={{ fontWeight: "500" }}>Flooring</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Floor Runner</li>
                             <li>Carpets</li>
                             <li>Floor Mats & Dhurries</li>
@@ -695,10 +684,7 @@ function Navbar() {
                           <div className="" style={{ color: "#e7bc00" }}>
                             <div style={{ fontWeight: "500" }}>Bath</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Bath Towels</li>
                             <li>Hand & Face Towels</li>
                             <li>Beach Towels</li>
@@ -713,10 +699,7 @@ function Navbar() {
                               Lamps & Lighting
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Floor Lamps</li>
                             <li>Ceiling Lamps</li>
                             <li>Table Lamps</li>
@@ -730,10 +713,7 @@ function Navbar() {
                             <div style={{ fontWeight: "500" }}>Home Decor</div>
                           </div>
 
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Plants & Planters</li>
                             <li>Aromas & Candles</li>
                             <li>Clocks</li>
@@ -762,10 +742,7 @@ function Navbar() {
                               Home Gift Sets
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Kitchen & Table</li>
                             <li>Dinnerware & Serveware</li>
                             <li>Cups and Mugs</li>
@@ -777,10 +754,7 @@ function Navbar() {
                           <div className="py-3" style={{ color: "#e7bc00" }}>
                             <div style={{ fontWeight: "500" }}>Storage</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Bins</li>
                             <li>Hangers</li>
                             <li>Organisers</li>
@@ -792,10 +766,7 @@ function Navbar() {
                           <div className="" style={{ color: "#e7bc00" }}>
                             <div style={{ fontWeight: "500" }}>Brands</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>H&M</li>
                             <li>Marks & Spencer</li>
                             <li>Home Center</li>
@@ -820,7 +791,8 @@ function Navbar() {
 
                 <li
                   style={{ width: "fit-content", fontSize: "15px" }}
-                  className="nav-item px-2 py-2"
+                  className="nav-item px-2 py-lg-0 py-2 align-items-center d-lg-flex"
+                  id="beauty"
                   onMouseOver={() =>
                     (document.getElementById("backdrop").style.display =
                       "block")
@@ -833,6 +805,14 @@ function Navbar() {
                     to="/"
                     className="nav-link text-dark"
                     style={{ fontWeight: "600" }}
+                    onMouseOver={() =>
+                      (document.getElementById("beauty").style.borderBottom =
+                        "4px solid #0db7af")
+                    }
+                    onMouseLeave={() =>
+                      (document.getElementById("beauty").style.borderBottom =
+                        "none")
+                    }
                   >
                     BEAUTY
                   </NavLink>
@@ -844,10 +824,7 @@ function Navbar() {
                           <div className="" style={{ color: "#069ebf" }}>
                             <div style={{ fontWeight: "500" }}>Makeup</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Lipstick</li>
                             <li>Lip Gloss</li>
                             <li>Lip Liner</li>
@@ -874,10 +851,7 @@ function Navbar() {
                               Skincare, Bath & Body
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Face Moisturiser</li>
                             <li>Cleanser</li>
                             <li>Masks & Peel</li>
@@ -903,10 +877,7 @@ function Navbar() {
                             <div style={{ fontWeight: "500" }}>Haircare</div>
                           </div>
 
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Shampoo</li>
                             <li>Conditioner</li>
                             <li>Hair Cream</li>
@@ -920,10 +891,7 @@ function Navbar() {
                           <div className="" style={{ color: "#069ebf" }}>
                             <div style={{ fontWeight: "500" }}>Fragrances</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Perfume</li>
                             <li>Deodrants</li>
                             <li>Body Mist</li>
@@ -933,10 +901,7 @@ function Navbar() {
                           <div className="" style={{ color: "#069ebf" }}>
                             <div style={{ fontWeight: "500" }}>Appliances</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Hair Straightener</li>
                             <li>Hair Dryer</li>
                             <li>Epilator</li>
@@ -947,10 +912,7 @@ function Navbar() {
                               Men's Grooming
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Trimmers</li>
                             <li>Beard Oil</li>
                             <li>Hair Wax</li>
@@ -961,10 +923,7 @@ function Navbar() {
                               Beauty Gift & Makeup Set
                             </div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Beauty Gift</li>
                             <li>Makeup Kit</li>
                           </ul>
@@ -983,10 +942,7 @@ function Navbar() {
                           <div className="" style={{ color: "#069ebf" }}>
                             <div style={{ fontWeight: "500" }}>Top Brands</div>
                           </div>
-                          <ul
-                            className="list-unstyled"
-                            style={{ color: "black" }}
-                          >
+                          <ul className="list-unstyled">
                             <li>Lakme</li>
                             <li>Maybeline</li>
                             <li>LOreal</li>
@@ -1011,12 +967,21 @@ function Navbar() {
 
                 <li
                   style={{ width: "fit-content", fontSize: "15px" }}
-                  className="nav-item px-2 py-2"
+                  className="nav-item px-2 py-lg-0 py-2 align-items-center d-lg-flex"
+                  id="studio"
                 >
                   <NavLink
                     to="/"
                     className="nav-link text-dark position-relative"
                     style={{ fontWeight: "600" }}
+                    onMouseOver={() =>
+                      (document.getElementById("studio").style.borderBottom =
+                        "4px solid #ff3f6c")
+                    }
+                    onMouseLeave={() =>
+                      (document.getElementById("studio").style.borderBottom =
+                        "none")
+                    }
                   >
                     STUDIO
                     <span className="position-absolute top-0 start-100 translate-middle badge text-danger">
@@ -1025,9 +990,9 @@ function Navbar() {
                   </NavLink>
                 </li>
 
-                <li className="nav-item searchbar w-50 pl-lg-5 pt-lg-0 pt-3">
+                <li className="searchbar w-50 pl-lg-5 pt-lg-0 pt-3">
                   {" "}
-                  <form className="d-flex align-items-center position-relative">
+                  <form className="d-flex align-items-center mr-3 position-relative">
                     <div
                       className="fa fa-search pl-3"
                       style={{
@@ -1084,17 +1049,109 @@ function Navbar() {
               </ul>
 
               <div className="list-unstyled align-items-center justify-content-center py-lg-0 py-4 d-flex ml-lg-auto mb-2 mb-lg-0 d-flex">
-                <div className="px-3" style={{ width: "fit-content" }}>
-                  <div className=" text-center">
+                <div
+                  className="px-2 navbar-nav"
+                  id="loginProfileIcon"
+                  style={{ width: "fit-content" }}
+                >
+                  <div className="text-center nav-item align-items-center d-lg-flex">
+                    <NavLink
+                      to="/"
+                      className="nav-link text-dark"
+                      style={{ fontWeight: "600" }}
+                    >
+                      <div>
+                        <div
+                          className="fa fa-user-o"
+                          style={{ fontSize: "17px" }}
+                        ></div>
+                        <div style={{ fontSize: "12px", fontWeight: "500" }}>
+                          Profile
+                        </div>
+                      </div>
+                    </NavLink>
                     <div
-                      className="fa fa-user-o"
-                      style={{ fontSize: "17px" }}
-                    ></div>
-                    <div style={{ fontSize: "12px" }}>
-                      <div style={{ fontWeight: "500" }}>Profile</div>
+                      className="dropdown-menu rounded-0 border-0"
+                      style={{ left: "76%" }}
+                    >
+                      <div
+                        className="p-3 bg-white"
+                        style={{
+                          width: "20vw",
+                          boxShadow: "0 1px 10px rgb(0 0 0 / 8%)",
+                        }}
+                      >
+                        <ul
+                          className="list-unstyled m-0"
+                          style={{ fontSize: "14px", color: "#3e4152" }}
+                        >
+                          <NavLink
+                            to="/profile"
+                            id="setupProfile"
+                            style={{ display: "none" }}
+                            className="text-decoration-none"
+                          >
+                            <div style={{ ottom: "1px solid #8080804d" }}>
+                              <div
+                                className="text-dark"
+                                style={{ fontWeight: "600" }}
+                              >
+                                Hello User
+                              </div>
+                              <div
+                                className="mb-1"
+                                style={{ color: "#3e4152" }}
+                              >
+                                73xxxxxxxx
+                              </div>
+                            </div>
+                          </NavLink>
+                          <div id="toLogin" style={{ color: "black" }}>
+                            <div style={{ fontWeight: "600" }}>Welcome</div>
+                            <div>to access account & manage orders</div>
+                            <NavLink to="/login">
+                              <div
+                                className="btn btn-danger mt-3 mb-2 bg-transparent loginBtn"
+                                style={{
+                                  color: "#ff3f6c",
+                                  transition: "0.5s",
+                                  fontWeight: "600",
+                                  border: "1px solid #eaeaec",
+                                }}
+                              >
+                                LOGIN / SIGNUP
+                              </div>
+                            </NavLink>
+                          </div>
+                          <hr style={{ color: "#A9ABB3" }}></hr>
+                          <li style={{ marginTop: "12px" }}>Orders</li>
+                          <li>Whishlist</li>
+                          <li>Gift Cards</li>
+                          <li>Contact Us</li>
+                          <li>
+                            Myntra Insider
+                            <span
+                              className="bg-danger rounded-pill text-white ml-3"
+                              style={{ fontSize: "10px", padding: "2px 5px" }}
+                            >
+                              New
+                            </span>
+                          </li>
+                          <hr style={{ color: "#A9ABB3" }}></hr>
+                          <li>Myntra Credit</li>
+                          <li>Coupons</li>
+                          <li>Saved Cards</li>
+                          <li>Saved VPA</li>
+                          <li>Saved Addresses</li>
+                          <hr style={{ color: "#A9ABB3" }}></hr>
+                          <li>Edit Profile</li>
+                          <li>Logout</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
+
                 <div className="px-3" style={{ width: "fit-content" }}>
                   <div className=" text-center">
                     <div
@@ -1139,7 +1196,8 @@ function Navbar() {
         </nav>
       ) : (
         <nav
-          className="navbar navbar-expand-lg fixed-top bg-white p-0 m-0 px-lg-5"
+          id="navbar"
+          className="navbar navbar-expand-lg bg-white p-0 m-0 px-lg-5"
           style={{ boxShadow: "0 4px 12px 0 rgb(0 0 0 / 5%)", zIndex: "6" }}
         >
           <div className="navbar-nav w-100 py-lg-3 px-3">
@@ -1262,7 +1320,10 @@ function Navbar() {
                           className="bg-white my-3 p-2"
                           style={{ boxShadow: "0px 0px 0px 1px #c0c0c094" }}
                         >
-                          <h2 className="py-1" style={{ fontSize: "12px", fontWeight:"500" }}>
+                          <h2
+                            className="py-1"
+                            style={{ fontSize: "12px", fontWeight: "500" }}
+                          >
                             RECENT SEARCHES
                           </h2>
                           <div className="dealsRow">
@@ -1280,7 +1341,12 @@ function Navbar() {
                                       alt="Deals of the day"
                                     />
                                   </NavLink>
-                                  <div className="text-center pt-2" style={{fontSize:"12px"}}>Name</div>
+                                  <div
+                                    className="text-center pt-2"
+                                    style={{ fontSize: "12px" }}
+                                  >
+                                    Name
+                                  </div>
                                 </div>
                               ))}
                             </div>
@@ -1292,7 +1358,7 @@ function Navbar() {
                           style={{ boxShadow: "0px 0px 0px 1px #c0c0c094" }}
                         >
                           <h2 className="py-1" style={{ fontSize: "12px" }}>
-                           TRENDING ON MYNTRA
+                            TRENDING ON MYNTRA
                           </h2>
                           <div className="dealsRow">
                             <div className="d-flex">
@@ -1376,7 +1442,11 @@ function Navbar() {
                 overflowY: "scroll",
               }}
             >
-              <div className="p-3" style={{ background: "#272027fa" }}>
+              <div
+                className="p-3"
+                id="userLoggedIn"
+                style={{ background: "#272027fa", display: "none" }}
+              >
                 <div className="d-flex">
                   <div
                     className="fa fa-user-o fa-lg rounded bg-white shadow-lg"
@@ -1396,16 +1466,87 @@ function Navbar() {
                 </div>
               </div>
 
+              <div
+                className="position-relative"
+                id="userNotLoggedIn"
+                style={{ display: "block" }}
+              >
+                <div
+                  className="ml-auto m-2 position-absolute text-center"
+                  style={{
+                    background: "rgb(0,0,0,0.6)",
+                    borderRadius: "50px",
+                    border:"2px solid black",
+                    right: 0,
+                    fontSize: "24px",
+                    width: "30px",
+                    height: "30px",
+                    cursor: "pointer",
+                    lineHeight: "0",
+                    zIndex: "1",
+                    color: "white",
+                    paddingTop: "11px",
+                  }}
+                  onClick={closeDrawer}
+                >
+                  &times;
+                </div>
+                <NavLink to="/login" onClick={closeDrawer}>
+                  <img src={loginImg} className="img-fluid" />
+                  <div
+                    className="pl-3 position-absolute align-items-center d-flex"
+                    style={{
+                      width: "calc(57%)",
+                      background: "rgb(255 241 243)",
+                      color: "red",
+                      bottom: "0",
+                      height: "100%",
+                      left: "0",
+                    }}
+                  >
+                    <div>
+                      <div className="Off">
+                        <div
+                          style={{ fontWeight: "700", fontSize: "18px" }}
+                          className="text-dark"
+                        >
+                          Flat ₹200 OFF
+                        </div>
+                        <div
+                          style={{ fontWeight: "700", fontSize: "18px" }}
+                          className="text-dark"
+                        >
+                          + Free Shiping
+                        </div>
+                        <div
+                          className="mt-1"
+                          style={{ color: "grey", fontSize: "14px" }}
+                        >
+                          On First Order
+                        </div>
+                      </div>
+                      <div
+                        className="mt-2"
+                        style={{ fontWeight: "500", fontSize: "14px" }}
+                      >
+                        {" "}
+                        SIGN UP. LOGIN
+                      </div>
+                    </div>
+                  </div>
+                </NavLink>
+              </div>
+
               <div className="" style={{ fontSize: "15px" }}>
                 <div className="px-3 pt-2 pb-1">
                   {sidebar.map((e) => {
                     return (
-                      <div key={e.id}>
+                      <div key={e.id} style={{ paddingBottom: "5px" }}>
                         <Accordion flush>
                           <Accordion.Item eventKey={e.id}>
                             <Accordion.Header>
                               <div
-                                className="d-flex align-items-center"
+                                className="d-flex text-dark align-items-center"
                                 style={{ fontWeight: "500", fontSize: "1rem" }}
                               >
                                 {e.name}
@@ -1421,7 +1562,12 @@ function Navbar() {
                             <Accordion.Body>
                               {e.subField.map((e1) => {
                                 return (
-                                  <Accordion flush id="alignInnerMenu">
+                                  <Accordion
+                                    flush
+                                    key={e1.id}
+                                    id="alignInnerMenu"
+                                    style={{ paddingBottom: "5px" }}
+                                  >
                                     <Accordion.Item eventKey="0">
                                       <Accordion.Header>
                                         <div className="d-flex align-items-center">

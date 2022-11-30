@@ -39,18 +39,20 @@ import {
   BudgetPicks,
   TrendingOutfits,
 } from "../Data/Data";
-// import Carousel from "react-material-ui-carousel";
 import Donate from "./images/Donation.webp";
 import Spotlight from "./images/spotlight.gif";
 
 function Home() {
-
-
+  window.scroll(0, 0);
+  useEffect(()=>{
+    document.getElementById("loginProfileIcon").style.display = "block";
+    document.body.style.background = "none";
+  },[])
 
   return (
-    <div style={{ marginTop: "100px" }}>
+    <div>
     <div className="backdrop" id="backdrop">.</div>
-      <div className="my-5">
+      <div className="my-lg-5 mb-5 mt-3">
         <Carousel>
           {Banner.map((e) => (
             <Carousel.Item interval="3000" key={e.id}>

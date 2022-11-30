@@ -5,6 +5,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 function Bag() {
+  window.scroll(0, 0);
   const { id } = useParams();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);

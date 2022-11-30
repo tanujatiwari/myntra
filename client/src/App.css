@@ -2,16 +2,60 @@
 .sidebar::-webkit-scrollbar,
 .content::-webkit-scrollbar,
 .drawer::-webkit-scrollbar,
-.dealsRow::-webkit-scrollbar {
+.dealsRow::-webkit-scrollbar,
+#login::-webkit-scrollbar,
+#signup::-webkit-scrollbar,
+#creatA::-webkit-scrollbar {
   width: 0px;
   height: 0px;
 }
+
+.navbar.active {
+  animation: fadeIn 0.4s linear forwards;
+  box-shadow: 0 8px 20px 0 rgb(0 0 0 / 10%);
+}
+
+.navbar {
+  transition: all 0.9s;
+  opacity: 1;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .item:hover {
   background: #eee;
 }
 .nav-item:hover .dropdown-menu {
   display: block;
-  animation: fadeIn 0.4s linear forwards;
+  animation: drop 0.4s linear forwards;
+}
+@keyframes drop {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+#navbarSupportedContent .nav-item {
+  height: 80px;
+}
+.loginBtn:hover {
+  background-color: #ff3f6c !important;
+  color: white !important;
 }
 .collapsed #changeArrow {
   transform: rotate(0deg);
@@ -43,27 +87,18 @@ button:focus {
 #drawer li {
   padding-left: 16px;
   padding-top: 8px;
+  padding-bottom: 8px;
 }
 #alignInnerMenu {
   padding-left: 12px;
 }
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(0);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 .dropdown-menu {
   opacity: 1;
-  background-color: transparent !important;
-  top: 55px;
   left: 0;
+  padding: 0;
+  margin: 0;
+  color: "#282C3F" !important;
 }
 .dropdown-menu .row {
   width: 70vw;
@@ -73,23 +108,43 @@ button:focus {
   padding: 5px 0px;
   font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
+  color: "#282C3F" !important;
 }
 
 @media (max-width: 990px) {
+  #navbarSupportedContent .nav-item {
+    height: auto;
+  }
   .dropdown-menu .row {
     width: fit-content;
   }
   .navbar-collapse {
     overflow-y: scroll;
-    height: 80vh;
+    height: 75vh;
+  }
+  .homeLiving {
+    width: fit-content !important;
   }
 }
+
 @media (max-width: 575px) {
-  /* .backdrop{
-    display: none !important;
-  } */
   .navbar-nav {
     padding: 15px 0px;
+  }
+  #mobileView {
+    height: 100vh !important;
+    width: 100vw !important;
+    top: 0;
+    z-index: 6;
+    position: absolute;
+  }
+}
+@media (max-width: 765px) {
+  #profile {
+    display: none;
+  }
+  #mobileProfile {
+    display: block !important;
   }
 }
 @keyframes fadeNav {
@@ -258,9 +313,6 @@ input[type="radio"] {
   #products .img-fluid {
     max-width: 70vw !important;
   }
-  #products {
-    margin-top: 70px !important;
-  }
 }
 
 @media (max-width: 350px) {
@@ -291,4 +343,61 @@ input[type="radio"] {
   right: 0;
   overflow-x: hidden;
   transition: 0.5s;
+}
+
+/* ---------------Profile--------------- */
+#userProfile .tab.active {
+  color: #14cda8;
+  font-weight: 500;
+}
+
+.overviewCards {
+  height: 220px;
+  transition: 0.5s;
+  padding-inline: 10px;
+}
+.overviewCards:hover,
+.deliveredCard:hover {
+  background-color: #eee !important;
+  cursor: pointer;
+}
+table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+table td,
+th {
+  font-size: 13px;
+  color: black;
+  padding: 10px 15px;
+}
+table .tt {
+  padding: 5px 15px !important;
+  font-size: 12px;
+  color: #7e818c;
+}
+.dropdown-menu li:hover {
+  font-weight: 600 !important;
+  cursor: pointer;
+}
+
+/* ------------------Login----------------------- */
+
+.resendBtn button {
+  background-color: transparent !important;
+  border: 0;
+  left: 0;
+  position: absolute;
+  margin-left: 10px;
+  font-weight: 600;
+  opacity: 0;
+}
+#otpLogin input[type="tel"] {
+  border: 1px solid #d4d5d9;
+  height: 40px !important;
+  border-radius: 2px;
+  width: 30px !important;
+}
+#otpLogin input[type="tel"]:focus {
+  outline: none;
+  border: 1px solid black;
 }

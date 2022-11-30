@@ -33,7 +33,7 @@ function Myntra() {
   };
 
   return (
-    <section id="products" style={{ marginTop: "100px" }}>
+    <section id="products">
       <div className="backdrop" id="backdrop">
         .
       </div>

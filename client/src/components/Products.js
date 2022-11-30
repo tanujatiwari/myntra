@@ -30,7 +30,7 @@ function Products() {
   }, []);
 
   return (
-    <div id="products" style={{ marginTop: "70px" }}>
+    <div id="products">
     <div className="backdrop" id="backdrop">.</div>
       {loading ? (
         <ImageSkeleton />
