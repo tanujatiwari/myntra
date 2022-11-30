@@ -4,7 +4,7 @@ const poolConfig = require('../database.json')
 const pool = new Pool(poolConfig['dev'])
 
 pool.connect(async (err) => {
-    if (err){
+    if (err) {
         console.log(err)
         return console.log("Pool connection err")
     }

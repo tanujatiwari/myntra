@@ -1,7 +1,14 @@
 const express = require('express')
 const app = express()
-const cron = require('./cron')
+const { deleteOtps, deleteExpiredTokens } = require('./cron')
+const cors = require("cors");
+const cookieParser = require('cookie-parser');
 
+app.use(cookieParser());
+app.use(cors({
+    origin: 'http://localhost:5000',
+    credentials: true
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -12,7 +19,8 @@ app.use('/', routes);
 
 app.use(error.errorHandler)
 
-cron.start();
+deleteOtps.start();
+deleteExpiredTokens.start();
 
 const port = process.env.PORT || 5000
 app.listen(port, () => {

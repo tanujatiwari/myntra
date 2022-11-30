@@ -1,7 +1,7 @@
 const cron = require('node-cron')
 const redis = require('../redis')
 
-const job = cron.schedule('*/1 * * * *', () => {
+module.exports.deleteOtps = cron.schedule('*/1 * * * *', () => {
     redis.keys('*').then(keys => {
         let pipeline = redis.pipeline();
         keys.forEach(key => {
@@ -11,9 +11,24 @@ const job = cron.schedule('*/1 * * * *', () => {
         });
         return pipeline.exec();
     });
-
 }, {
     scheduled: false
 })
 
-module.exports = job
+//not working
+module.exports.deleteExpiredTokens = cron.schedule('* */5 * * *', () => {
+    redis.keys('*').then(keys => {
+        let pipeline = redis.pipeline();
+        keys.forEach(key => {
+            const value = pipeline.get(key)
+            if (value + 24 * 60 * 60 * 1000 < Date.now()){
+                console.log('deleting...')
+                pipeline.del(key)
+            }
+        });
+        return pipeline.exec();
+    });
+
+}, {
+    scheduled: false
+})
