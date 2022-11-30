@@ -8,6 +8,8 @@ router.post('/login', controllers.login)
 
 router.post('/login/otplogin', controllers.otpLogin)
 
+router.post('/login/password', controllers.passwordLogin)
+
 router.post('/logout', authenticateToken, controllers.logout)
 
 router.use('*', controllers.notFound)

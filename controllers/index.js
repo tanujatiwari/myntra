@@ -3,6 +3,7 @@ const { generateOtp } = require('../services/otp')
 const redis = require('../redis')
 const client = require('../services/messaging')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 const generateAccessToken = (user) => {
     return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: '2h' })
@@ -76,12 +77,9 @@ module.exports.otpLogin = async (req, res, next) => {
             err.statusCode = 401
             return next(err)
         }
-        //create jwt token and store in redis
         let userId = userIdObject.rows[0].id
-        console.log(userId)
         const userData = { mobile, userId }
         const accessToken = generateAccessToken(userData)
-        //send token to user
         res.cookie('jwt', accessToken, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000 //1 day expiration
@@ -91,6 +89,43 @@ module.exports.otpLogin = async (req, res, next) => {
     catch (err) {
         next(err)
     }
+}
+
+module.exports.passwordLogin = async (req, res, next) => {
+    try {
+        const { loginId, password } = req.body;
+        const userIdObject = await query.checkUserExists(loginId)
+        if (!userIdObject) {
+            const err = new Error('Cannot fetch user details from database')
+            return next(err)
+        }
+        if ((userIdObject.rows.length === 0)) {
+            let message = 'Account does not exist'
+            const err = new Error(message)
+            err.statusCode = 400
+            err.clientMessage = message
+            return next(err)
+        }
+        if (!(await bcrypt.compare(password, userIdObject.rows[0].password))) {
+            let message = 'Email and password does not match'
+            const err = new Error(message)
+            err.statusCode = 403
+            err.clientMessage = message
+            return next(err)
+        }
+        let userId = userIdObject.rows[0].id
+        const userData = { mobile, userId }
+        const accessToken = generateAccessToken(userData)
+        res.cookie('jwt', accessToken, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000 //1 day expiration
+        })
+        res.json({ "message": "Logged in successfully!" })
+    }
+    catch (err) {
+        next(err)
+    }
+
 }
 
 module.exports.logout = async (req, res, next) => {
