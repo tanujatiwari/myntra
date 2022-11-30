@@ -8,10 +8,6 @@ const generateAccessToken = (user) => {
     return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: '2h' })
 }
 
-const generateRefreshToken = (user) => {
-    return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: '1d' })
-}
-
 module.exports.login = async (req, res, next) => {
     try {
         const { mobile } = req.body;
@@ -26,6 +22,7 @@ module.exports.login = async (req, res, next) => {
             //create user
             const newUserId = await query.createUser(mobile)
             userId = newUserId.rows[0].id
+            res.status(201)
         }
         //create otp and store in redis
         const otp = await generateOtp()
@@ -79,42 +76,17 @@ module.exports.otpLogin = async (req, res, next) => {
             err.statusCode = 401
             return next(err)
         }
-        //create session
-        const userId = userIdObject.rows[0].id
-        const sessionIdObject = await query.createSession(userId)
-        const sessionId = sessionIdObject.rows[0].id
         //create jwt token and store in redis
-        const userData = { mobile, userId, sessionId }
+        let userId = userIdObject.rows[0].id
+        console.log(userId)
+        const userData = { mobile, userId }
         const accessToken = generateAccessToken(userData)
-        const refreshToken = generateRefreshToken(userData)
-        await redis.set(refreshToken, Date.now())
         //send token to user
-        res.cookie('jwt', refreshToken, {
+        res.cookie('jwt', accessToken, {
             httpOnly: true,
-            sameSite: 'None', secure: true,
             maxAge: 24 * 60 * 60 * 1000 //1 day expiration
         })
-        res.json({ message, accessToken })
-    }
-    catch (err) {
-        next(err)
-    }
-}
-
-module.exports.generateRefreshToken = async (req, res, next) => {
-    try {
-        const refreshToken = req.cookies.jwt;
-        if (!refreshToken)
-            return res.status(403).json({ "message": "No token found" })
-        if (!(await redis.get(refreshToken))) {
-            return res.status(403).json({ "message": "Invalid or expired token" })
-        }
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (err, user) => {
-            if (err)
-                return res.status(403).json({ "message": "Invalid or expired token" })
-            const accessToken = generateAccessToken({ mobile: user.mobile, sessionId: user.sessionId, userId: user.userId })
-            res.json({ accessToken })
-        })
+        res.json({ message })
     }
     catch (err) {
         next(err)
@@ -123,20 +95,6 @@ module.exports.generateRefreshToken = async (req, res, next) => {
 
 module.exports.logout = async (req, res, next) => {
     try {
-        console.log(req.cookies)
-        console.log(req.cookie)
-        const refreshToken = req.cookies.jwt;
-        if (!refreshToken) {
-            const err = new Error('No refresh token found')
-            return next(err)
-        }
-        //update session
-        const { sessionId } = req.user
-        const currDate = new Date()
-        await query.logoutFromSessions(sessionId, currDate.toISOString())
-        //delete from redis
-        await redis.del(refreshToken);
-        //delete your refresh token cookie
         res.clearCookie("jwt");
         res.json({ "message": "Successfully logged out!" })
     }
