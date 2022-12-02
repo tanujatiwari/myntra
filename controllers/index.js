@@ -4,14 +4,16 @@ const redis = require('../redis')
 const client = require('../services/messaging')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+const transporter = require('../services/email')
 
 const generateAccessToken = (user) => {
-    return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: '2h' })
+    return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: '5h' })
 }
 
 module.exports.login = async (req, res, next) => {
     try {
-        const { mobile } = req.body;
+        const { number } = req.body;
+        const mobile = number;
         //check if user exists`
         const userData = await query.checkUserExists(mobile)
         if (!userData) {
@@ -45,6 +47,7 @@ module.exports.login = async (req, res, next) => {
 
     }
     catch (err) {
+        console.log(err)
         next(err);
     }
 }
@@ -93,8 +96,8 @@ module.exports.otpLogin = async (req, res, next) => {
 
 module.exports.passwordLogin = async (req, res, next) => {
     try {
-        const { loginId, password } = req.body;
-        const userIdObject = await query.checkUserExists(loginId)
+        const { email, password } = req.body;
+        const userIdObject = await query.checkUserExists(email)
         if (!userIdObject) {
             const err = new Error('Cannot fetch user details from database')
             return next(err)
@@ -114,7 +117,7 @@ module.exports.passwordLogin = async (req, res, next) => {
             return next(err)
         }
         let userId = userIdObject.rows[0].id
-        const userData = { mobile, userId }
+        const userData = { email, userId }
         const accessToken = generateAccessToken(userData)
         res.cookie('jwt', accessToken, {
             httpOnly: true,
@@ -125,13 +128,114 @@ module.exports.passwordLogin = async (req, res, next) => {
     catch (err) {
         next(err)
     }
+}
 
+module.exports.createAccount = async (req, res, next) => {
+    try {
+        const { password, name, email, gender, number1, hintName, location } = req.body;
+        const { userId } = req.user
+        const bcryptRounds = 10
+        const hashedPassword = bcrypt.hashSync(password, bcryptRounds)
+        await query.addNewUserDetails(userId, name, hashedPassword, email, gender, location, number1, hintName);
+        res.status(201).json({ "message": "User Sign up successful!" })
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.forgetPassword = async (req, res, next) => {
+    try {
+        //email ya text kardo password reset link ko
+        const { loginId } = req.body;
+        const userIdObject = await query.checkUserExists(loginId)
+        if (!userIdObject) {
+            const err = new Error('Cannot fetch user details from database')
+            return next(err)
+        }
+        if (userIdObject.rows.length === 0) {
+            const message = 'Account does not exist'
+            const err = new Error(message)
+            err.clientMessage = message
+            err.statusCode = 400
+            return next(err)
+        }
+        //send email/mobile with password reset link
+        if (loginId.includes('@')) { //email
+            const mailOptions = {
+                from: process.env.EMAIL,
+                to: loginId,
+                subject: 'Password Email Mail',
+                text: 'Hiiiiiiiiiii'
+            };
+
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+        }
+    }
+    catch (err) {
+        console.log(err)
+        next(err)
+    }
 }
 
 module.exports.logout = async (req, res, next) => {
     try {
         res.clearCookie("jwt");
         res.json({ "message": "Successfully logged out!" })
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.getAddresses = async (req, res, next) => {
+    try {
+        const { userId } = req.user
+        const addressesObject = await query.getUserAddresses(userId);
+        const allAddresses = addressesObject.rows
+        res.json({ "data": allAddresses })
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.newAddress = async (req, res, next) => {
+    try {
+        const { fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday } = req.body
+        const { userId } = req.user
+        await query.addUserAddress(userId, fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday)
+        return res.status(201).json({ "message": "Address added successfully" })
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.updateAddress = async (req, res, next) => {
+    try {
+        const { id } = req.params
+        const { fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday } = req.body
+        await query.editUserAddress(id, fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday)
+        return res.status(201).json({ "message": "Address edited successfully" })
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.deleteAddress = async (req, res, next) => {
+    try {
+        const { id } = req.params
+        const currDate = new Date()
+        await query.deleteAddress(currDate.toISOString(), id)
+        res.json({ "message": "Address deleted successfully" })
     }
     catch (err) {
         next(err)

@@ -42,8 +42,9 @@ const App = () => {
             <Route exact path="/myntra/:id" component={Products} />
             <Route exact path="/login" component={Login} />
             <Route exact path="/profile" component={Profile} />
-            <Route exact path="/createAccount" component={CreateAccount} />
-            <Route exact path="/signup" component={SignUp} />
+            <Route exact path="/login/:no" component={Otp} />
+            <Route exact path="/:no/createAccount" component={CreateAccount} />
+            <Route exact path="/:no/createAccount/signup/" component={SignUp} />
             <Route exact path="/orders" component={Orders} />
             <Route exact path="/credit" component={MyntraCredit} />
             <Route exact path="/myncash" component={MynCash} />
@@ -52,7 +53,6 @@ const App = () => {
             <Route exact path="/address" component={Addresses} />
             <Route exact path="/coupons" component={Coupons} />
             <Route exact path="/editProfile" component={ProfileDetails} />
-            <Route exact path="/otpLogin" component={Otp} />
             <Route exact path="/password" component={LoginUsingPassword} />
             <Route exact path="/forgot" component={ResetPassword} />
           </div>

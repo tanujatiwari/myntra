@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import create from "./images/createAcc.png";
 
 function CreateAcc() {
   window.scroll(0, 0);
+  const { no } = useParams();
   useEffect(() => {
     document.getElementById("footer").style.display = "none";
     document.body.style.background = "rgb(255 192 203 / 30%)";
@@ -74,7 +75,7 @@ function CreateAcc() {
           >
             New to Myntra?
           </div>
-          <NavLink to="/signup" className="text-decoration-none">
+          <NavLink to={`/${no}/createAccount/signup`} className="text-decoration-none">
             <div
               className="btn btn-danger rounded-0 my-3 text-dark align-items-center d-flex justify-content-center w-100 fa fa-user-o bg-transparent"
               style={{

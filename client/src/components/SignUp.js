@@ -1,47 +1,101 @@
-import React, { useEffect } from "react";
-import { NavLink, useHistory } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { NavLink, useHistory, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
+import Mobile from "./LoginSignup";
 
 function SignUp() {
   const history = useHistory();
   window.scroll(0, 0);
+  const { no } = useParams();
   useEffect(() => {
     document.getElementById("footer").style.display = "none";
     document.body.style.background = "rgb(255 192 203 / 30%)";
     // document.getElementById("loginProfileIcon").style.display = "none";
   }, []);
-  const setupAcc = () => {
-    document.getElementById("setupProfile").style.display = "block";
-    document.getElementById("toLogin").style.display = "none";
-    history.push("/");
+  // const setupAcc = () => {
+  //   PostData();
+  //   document.getElementById("setupProfile").style.display = "block";
+  //   document.getElementById("toLogin").style.display = "none";
+  //   history.push("/");
+  // };
+
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    // number: "",
+    number1: "",
+    password: "",
+  });
+
+  let name, value;
+  const handleInputs = (e) => {
+    console.log(e);
+    name = e.target.name;
+    value = e.target.value;
+
+    setUser({ ...user, [name]: value });
   };
+
+  const PostData = async (e) => {
+    e.preventDefault();
+    const { name, email, number1, password } = user;
+    const res = await fetch("/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        email,
+        number1,
+        password,
+        no,
+      }),
+    });
+    const data = await res.json();
+    if (res.status === 201) {
+      Swal.fire("", "SignUp Successful", "success", {
+        timer: 2200,
+        buttons: false,
+      });
+      console.log("SignUp Successful");
+    } else {
+      Swal.fire("", "Invalid Credentials!", "error", {
+        timer: 2200,
+        buttons: false,
+      });
+      console.log("Invalid Credentials");
+    }
+  };
+
   return (
     <section id="signup">
       <div className="backdrop" id="backdrop">
         .
       </div>
-      <div
-        className="justify-content-center mt-lg-5 mt-md-4 mt-sm-4 align-items-center d-flex"
-      >
+      <div className="justify-content-center mt-lg-5 mt-md-4 mt-sm-4 align-items-center d-flex">
         <div
-        id="mobileView"
+          id="mobileView"
           className="bg-white p-3 mx-lg-3 mx-md-3 mx-sm-3"
           style={{ height: "fit-content", width: "500px" }}
         >
           <div className="mb-3" style={{ fontWeight: "600", fontSize: "18px" }}>
             Complete your sign up
           </div>
-          <form action="/">
+          <form method="POST">
             <div>
               <div className="d-flex align-items-center">
                 <div style={{ color: "grey" }}>Mobile Number</div>
                 <div className="fa fa-check-circle text-success ml-auto"></div>
               </div>
-              <div>xxxxxxxxxxx</div>
+              <div>{no}</div>
+
               <input
                 className="form-control shadow-none mt-4 rounded-0"
                 type="text"
                 placeholder="Create Password"
-                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                pattern="(?=.\d)(?=.[a-z])(?=.*[A-Z]).{8,}"
+                name="password"
+                value={user.password}
+                onChange={handleInputs}
                 style={{ height: "40px" }}
               />
               <div className="row gx-0">
@@ -102,12 +156,18 @@ function SignUp() {
                 className="form-control shadow-none mt-4 mb-2 rounded-0"
                 type="text"
                 placeholder="Full Name"
+                name="name"
+                value={user.name}
+                onChange={handleInputs}
                 style={{ height: "40px" }}
               />
               <input
                 className="form-control shadow-none mt-4 mb-2 rounded-0"
                 type="email"
                 placeholder="Email (Optional)"
+                name="email"
+                value={user.email}
+                onChange={handleInputs}
                 style={{ height: "40px" }}
               />
               <div className="d-flex my-3" style={{ color: "grey" }}>
@@ -140,6 +200,9 @@ function SignUp() {
                   type="tel"
                   placeholder="Alternate Mobile Number"
                   pattern="[0-9]{10}"
+                  name="number"
+                  // value={user.number}
+                  // onChange={handleInputs}
                   style={{ height: "40px", paddingLeft: "54px" }}
                 />
               </div>
@@ -151,6 +214,9 @@ function SignUp() {
               <input
                 className="form-control shadow-none mt-3 rounded-0"
                 type="text"
+                name="number1"
+                value={user.number1}
+                onChange={handleInputs}
                 placeholder="Hint name (Alternate number)"
                 style={{ height: "40px" }}
               />
@@ -161,14 +227,14 @@ function SignUp() {
                 This name will be a hint for your alternate number
               </label>
             </div>
-            <button
-              type="submit"
+            <NavLink
+              to="/"
               className="btn btn-danger border-0 w-100 rounded-0 mt-4 py-2 mb-2"
               style={{ background: "rgb(255, 63, 108)", fontWeight: "700" }}
-              onClick={setupAcc}
+              onClick={PostData}
             >
               CREATE ACCOUNT
-            </button>
+            </NavLink>
           </form>
         </div>
       </div>

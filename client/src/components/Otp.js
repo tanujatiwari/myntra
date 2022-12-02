@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import otpImg from "./images/mobile-verification.jpg";
 import OTPInput, { ResendOTP } from "otp-input-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
 function Otp() {
+  const { no } = useParams();
   useEffect(() => {
     document.getElementById("footer").style.display = "none";
     document.body.style.background = "rgb(255 192 203 / 30%)";
@@ -45,7 +47,46 @@ function Otp() {
   };
   reset();
 
-  const [OTP, setOTP] = useState("");
+  const [OTP, setOTP] = useState({ num1: "", num2: "", num3: "", num4: "" });
+
+  let name, value;
+  const handleInputs = (e) => {
+    console.log(e);
+    name = e.target.name;
+    value = e.target.value;
+
+    setOTP({ ...OTP, [name]: value });
+  };
+  const PostData = async (e) => {
+    e.preventDefault();
+    const { num1, num2, num3, num4 } = OTP;
+    let otp = `${num1}${num2}${num3}${num4}`
+    otp = Number(otp);
+    const mobile = no;
+    const res = await fetch("/login/otplogin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mobile,
+        otp
+      }),
+    });
+    const data = await res.json();
+    if (res.status === 200 || res.status === 201) {
+      Swal.fire("", "OTP verified", "success", {
+        timer: 2200,
+        buttons: false,
+      });
+      window.location.href = `/${no}/createAccount`;
+      console.log("All fields are mandatory");
+    }
+    else {
+      Swal.fire("Oops", "OTP not verified", "warning", {
+        timer: 2200,
+        buttons: false,
+      });
+    }
+  };
   return (
     <section id="otpLogin">
       <div className="backdrop" id="backdrop">
@@ -74,19 +115,73 @@ function Otp() {
             >
               Sent to xxxxxxxxxx
             </div>
-            <OTPInput
-              value={OTP}
-              onChange={setOTP}
-              autoFocus
-              OTPLength={4}
-              otpType="number"
-            />
-            <ResendOTP
-              maxTime={30}
-              renderTime={renderTime}
-              className="resendBtn my-4"
-              onResendClick={setRender}
-            />
+            <form>
+              {/*<OTPInput
+                value={OTP.number}
+                onChange={handleInputs}
+                autoFocus
+                OTPLength={4}
+                otpType="number"
+                name="number"
+  />*/}
+              <input
+                type="tel"
+                pattern="[0-9]{1}"
+                maxLength={1}
+                className="text-center"
+                value={OTP.num1}
+                onChange={handleInputs}
+                name="num1"
+              />
+              <input
+                type="tel"
+                pattern="[0-9]{1}"
+                maxLength={1}
+                className="text-center mx-3"
+                value={OTP.num2}
+                onChange={handleInputs}
+                name="num2"
+              />
+              <input
+                type="tel"
+                pattern="[0-9]{1}"
+                maxLength={1}
+                className="text-center"
+                value={OTP.num3}
+                onChange={handleInputs}
+                name="num3"
+              />
+              <input
+                type="tel"
+                pattern="[0-9]{1}"
+                maxLength={1}
+                className="text-center ml-3"
+                value={OTP.num4}
+                onChange={handleInputs}
+                name="num4"
+              />
+              <ResendOTP
+                maxTime={30}
+                renderTime={renderTime}
+                className="resendBtn my-4"
+                onResendClick={setRender}
+              />
+              <button
+                type="submit"
+                className="text-decoration-none"
+                onClick={PostData}
+              >
+                {" "}
+                <span
+                  style={{
+                    color: "#FF3C6F",
+                    fontWeight: "600",
+                  }}
+                >
+                  send otp
+                </span>
+              </button>
+            </form>
             <div style={{ fontSize: "12px" }}>
               Log in using{" "}
               <NavLink to="/password" className="text-decoration-none">
