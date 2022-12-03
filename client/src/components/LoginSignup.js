@@ -91,10 +91,10 @@ function LoginSignup(props) {
               <b style={{ color: "#424553", fontSize: "20px" }}>Signup</b>
             </div>
             <form
-              action={`/${no}/createAccount`}
+              // action={`/${no}/createAccount`}
               className="position-relative mt-4"
-              method="POST"
-              onSubmit={PostData}
+              // method="POST"
+              // onSubmit={PostData}
             >
               <div className="align-items-center d-flex">
                 <div
@@ -143,7 +143,7 @@ function LoginSignup(props) {
                 type="submit"
                 className="btn btn-danger border-0 rounded-0 w-100 my-2 py-2"
                 style={{ background: "rgb(255, 63, 108)", fontWeight: "700" }}
-                // onClick={PostData}
+                onClick={PostData}
               >
                 CONTINUE
               </button>

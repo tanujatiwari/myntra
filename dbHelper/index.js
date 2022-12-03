@@ -1,7 +1,8 @@
 const pool = require('../models')
 
-module.exports.checkUserExists = async (loginId) => {
-    return await pool.query(`select id,mobile,email,password from users where mobile=$1 or email=$1`, [loginId])
+module.exports.getUserDetails = async (loginId) => {
+    console.log(loginId)
+    return await pool.query(`select id,full_name, mobile,email,password,gender,birth_date,location,alternate_mobile,hint_name from users where mobile=$1 or email=$1`, [loginId])
 }
 
 module.exports.createUser = async (mobile) => {
@@ -26,4 +27,8 @@ module.exports.deleteAddress = async (currDate, addressId) => {
 
 module.exports.editUserAddress = async (addressId, fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday) => {
     return await pool.query(`update addresses set full_name=$2, mobile=$3, pincode=$4, state=$5, address=$6, locality=$7, city=$8, type_of_address=$9, is_default_address=$10, is_open_on_saturday=$11, is_open_on_sunday=$12 where id=$1`, [addressId, fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday])
+}
+
+module.exports.editProfile = async (userId, mobile, name, email, gender, hintName, alternateMobile, birthDate, location) => {
+    return await pool.query(`update users set full_name=$2, email=$3, gender=$4, hint_name=$5, alternate_mobile=$6, birth_date=$7, location=$8, mobile=$9 where id=$1`, [userId, name, email, gender, hintName, alternateMobile, birthDate, location, mobile])
 }

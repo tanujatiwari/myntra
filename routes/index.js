@@ -11,13 +11,18 @@ router.post('/login/otplogin', controllers.otpLogin)
 
 router.post('/password', controllers.passwordLogin)
 
-router.post('/forgot', controllers.forgetPassword)
-
 router.post('/signup', authenticateToken, controllers.createAccount)
 
 router.post('/logout', authenticateToken, controllers.logout)
 
-//address routes
+// router.post('/forgot', controllers.forgetPassword)
+
+//user data routes
+
+router.get('/profile', authenticateToken, controllers.profile)
+
+router.patch('/edit-profile', authenticateToken, controllers.editProfile)
+
 router.get('/addresses', authenticateToken, controllers.getAddresses)
 
 router.post('/addresses/new',authenticateToken, controllers.newAddress)

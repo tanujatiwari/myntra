@@ -77,6 +77,8 @@ function Otp() {
         timer: 2200,
         buttons: false,
       });
+      document.getElementById("toLogin").style.display = "none";
+      document.getElementById("setupProfile").style.display = "block";
       window.location.href = `/${no}/createAccount`;
       console.log("All fields are mandatory");
     }
