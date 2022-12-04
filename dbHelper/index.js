@@ -1,7 +1,6 @@
 const pool = require('../models')
 
 module.exports.getUserDetails = async (loginId) => {
-    console.log(loginId)
     return await pool.query(`select id,full_name, mobile,email,password,gender,birth_date,location,alternate_mobile,hint_name from users where mobile=$1 or email=$1`, [loginId])
 }
 

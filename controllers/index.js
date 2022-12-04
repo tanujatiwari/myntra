@@ -216,18 +216,6 @@ module.exports.logout = async (req, res, next) => {
     }
 }
 
-module.exports.getAddresses = async (req, res, next) => {
-    try {
-        const { userId } = req.user
-        const addressesObject = await query.getUserAddresses(userId);
-        const allAddresses = addressesObject.rows
-        res.json({ "data": allAddresses })
-    }
-    catch (err) {
-        next(err)
-    }
-}
-
 module.exports.newAddress = async (req, res, next) => {
     try {
         const { fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday } = req.body
@@ -266,10 +254,16 @@ module.exports.deleteAddress = async (req, res, next) => {
 
 module.exports.profile = async (req, res, next) => {
     try {
-        const { loginId } = req.user
-        const userObject = await query.getUserDetails(loginId)
-        const userData = userObject.rows;
-        res.json({ "data": userData })
+        const { loginId, userId } = req.user
+        const [userObject, addressesObject] = await Promise.all([query.getUserDetails(loginId), query.getUserAddresses(userId)])
+        const userDetails = { ...userObject.rows[0] }
+        if (addressesObject.rows.length === 0) {
+            userDetails.addresses = [];
+        }
+        else {
+            userDetails.addresses = addressesObject.rows;
+        }
+        res.json({ "data": userDetails })
     }
     catch (err) {
         next(err)
