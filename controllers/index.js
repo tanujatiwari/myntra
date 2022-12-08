@@ -137,11 +137,11 @@ module.exports.passwordLogin = async (req, res, next) => {
 
 module.exports.createAccount = async (req, res, next) => {
     try {
-        const { password, name, email, gender, number1, hintName, location } = req.body;
+        const { password, name, email, gender, number1, hintName, location, birthDate } = req.body;
         const { userId } = req.user
         const bcryptRounds = 10
         const hashedPassword = bcrypt.hashSync(password, bcryptRounds)
-        await query.addNewUserDetails(userId, name, hashedPassword, email, gender, location, number1, hintName);
+        await query.addNewUserDetails(userId, name, hashedPassword, email, gender, location, number1, hintName, birthDate);
         res.status(201).json({ "message": "User Sign up successful!" })
     }
     catch (err) {
@@ -218,9 +218,9 @@ module.exports.logout = async (req, res, next) => {
 
 module.exports.newAddress = async (req, res, next) => {
     try {
-        const { fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday } = req.body
+        const { full_name, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday } = req.body
         const { userId } = req.user
-        await query.addUserAddress(userId, fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday)
+        await query.addUserAddress(userId, full_name, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday)
         return res.status(201).json({ "message": "Address added successfully" })
     }
     catch (err) {
@@ -231,8 +231,8 @@ module.exports.newAddress = async (req, res, next) => {
 module.exports.updateAddress = async (req, res, next) => {
     try {
         const { id } = req.params
-        const { fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday } = req.body
-        await query.editUserAddress(id, fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday)
+        const { full_name, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday } = req.body
+        await query.editUserAddress(id, full_name, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday)
         return res.status(201).json({ "message": "Address edited successfully" })
     }
     catch (err) {
@@ -273,12 +273,52 @@ module.exports.profile = async (req, res, next) => {
 module.exports.editProfile = async (req, res, next) => {
     try {
         const { userId } = req.user
-        const { number, name, email, gender, hint, alternateNumber, birthDate, location } = req.body;
-        await query.editProfile(userId, number, name, email, gender, hint, alternateNumber, birthDate, location)
+        const { full_name, email, gender, hint_name, alternate_mobile, birth_date, location } = req.body;
+        await query.editProfile(userId, full_name, email, gender, hint_name, alternate_mobile, birth_date, location)
         res.json({ "message": "Edited profile successfully!" })
     }
     catch (err) {
         console.log(err)
+        next(err)
+    }
+}
+
+module.exports.getCategoryProducts = async (req, res, next) => {
+    try {
+        const productsObject = await query.getCategoryProducts();
+        res.json({ "data": productsObject.rows })
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.getSubcategoryProducts = async (req, res, next) => {
+    try {
+        const productsObject = await query.getSubcategoryProducts();
+        res.json({ "data": productsObject.rows })
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.getProductTypeProduct = async (req, res, next) => {
+    try {
+        const productsObject = await query.getProductTypeProduct();
+        res.json({ "data": productsObject.rows })
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.getProduct = async (req, res, next) => {
+    try {
+        const productsObject = await query.getProduct();
+        res.json({ "data": productsObject.rows })
+    }
+    catch (err) {
         next(err)
     }
 }

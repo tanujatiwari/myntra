@@ -12,8 +12,8 @@ module.exports.addUserAddress = async (userId, fullName, mobile, pincode, state,
     return await pool.query(`insert into addresses(user_id, full_name, mobile, pincode, state, address, locality, city, type_of_address, is_default_address, is_open_on_saturday, is_open_on_sunday) values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`, [userId, fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday])
 }
 
-module.exports.addNewUserDetails = async (userId, fullName, password, email, gender, alternateMobile, hintName, location, birth_date) => {
-    return await pool.query(`update users set full_name=$1, email=$2, password=$3, gender=$4, alternate_mobile=$5, location=$6, hint_name=$7, birth_date=$8 where id=$9`, [fullName, email, password, gender, alternateMobile, location, hintName, birth_date, userId])
+module.exports.addNewUserDetails = async (userId, fullName, password, email, gender, location, alternateMobile, hintName, birthDate) => {
+    return await pool.query(`update users set full_name=$1, email=$2, password=$3, gender=$4, alternate_mobile=$5, location=$6, hint_name=$7, birth_date=$8 where id=$9`, [fullName, email, password, gender, alternateMobile, location, hintName, birthDate, userId])
 }
 
 module.exports.getUserAddresses = async (userId) => {
@@ -28,6 +28,22 @@ module.exports.editUserAddress = async (addressId, fullName, mobile, pincode, st
     return await pool.query(`update addresses set full_name=$2, mobile=$3, pincode=$4, state=$5, address=$6, locality=$7, city=$8, type_of_address=$9, is_default_address=$10, is_open_on_saturday=$11, is_open_on_sunday=$12 where id=$1`, [addressId, fullName, mobile, pincode, state, address, locality, city, typeOfAddress, isDefaultAddress, isOpenOnSaturday, isOpenOnSunday])
 }
 
-module.exports.editProfile = async (userId, mobile, name, email, gender, hintName, alternateMobile, birthDate, location) => {
-    return await pool.query(`update users set full_name=$2, email=$3, gender=$4, hint_name=$5, alternate_mobile=$6, birth_date=$7, location=$8, mobile=$9 where id=$1`, [userId, name, email, gender, hintName, alternateMobile, birthDate, location, mobile])
+module.exports.editProfile = async (userId, name, email, gender, hintName, alternateMobile, birthDate, location) => {
+    return await pool.query(`update users set full_name=$2, email=$3, gender=$4, hint_name=$5, alternate_mobile=$6, birth_date=$7, location=$8 where id=$1`, [userId, name, email, gender, hintName, alternateMobile, birthDate, location])
+}
+
+module.exports.getCategoryProducts = async () => {
+    return await pool.query(`select * from products`);
+}
+
+module.exports.getSubcategoryProducts = async () => {
+    return await pool.query(`select * from products`);
+}
+
+module.exports.getProductTypeProduct = async () => {
+    return await pool.query(`select * from products`);
+}
+
+module.exports.getProduct = async () => {
+    return await pool.query(`select * from products`);
 }

@@ -30,8 +30,8 @@ function Profile() {
     axios
       .get("/profile")
       .then((e) => {
-        setUserData(e.data.data[0]);
-        console.log(e.data.data[0]);
+        setUserData(e.data.data);
+        console.log(e.data.data);
       })
       .catch((err) => console.log(err));
   };
