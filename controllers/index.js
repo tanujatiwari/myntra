@@ -4,11 +4,18 @@ const redis = require('../redis')
 const client = require('../services/messaging')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-// const main = require('../services/email')
-const nodemailer = require('nodemailer');
+const sendEmail = require('../services/email')
 
 const generateAccessToken = (user) => {
     return jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: '5h' })
+}
+
+const generateForgetPasswordToken = (user) => {
+    return jwt.sign(user, process.env.FORGET_PASSWORD_ACCESS_TOKEN, { expiresIn: '10h' })
+}
+
+const convertStringToArray = (string) => {
+    return string.split('|')
 }
 
 module.exports.login = async (req, res, next) => {
@@ -127,9 +134,6 @@ module.exports.passwordLogin = async (req, res, next) => {
         })
         res.json({ "message": "Logged in successfully!" })
     }
-    //who you????????????
-    //who you think you??????
-    //which year?????????
     catch (err) {
         next(err)
     }
@@ -149,62 +153,90 @@ module.exports.createAccount = async (req, res, next) => {
     }
 }
 
-// module.exports.forgetPassword = async (req, res, next) => {
-//     try {
-//         //email ya text kardo password reset link ko
-//         const { loginId } = req.body;
-//         const userIdObject = await query.getUserDetails(loginId)
-//         if (!userIdObject) {
-//             const err = new Error('Cannot fetch user details from database')
-//             return next(err)
-//         }
-//         if (userIdObject.rows.length === 0) {
-//             const message = 'Account does not exist'
-//             const err = new Error(message)
-//             err.clientMessage = message
-//             err.statusCode = 400
-//             return next(err)
-//         }
-//         //send email/mobile with password reset link
-//         if (loginId.includes('@')) { //email
-//             const transporter = nodemailer.createTransport({
-//                 service: 'SendPulse',
-//                 auth: {
-//                     user: 'tanujatiwari444@gmail.com',
-//                     pass: 'Suryansh@5476'
-//                 }
-//             });
+module.exports.forgetPassword = async (req, res, next) => {
+    try {
+        //email ya text kardo password reset link ko
+        const { loginId } = req.body;
+        const userIdObject = await query.getUserDetails(loginId)
+        if (!userIdObject) {
+            const err = new Error('Cannot fetch user details from database')
+            return next(err)
+        }
+        if (userIdObject.rows.length === 0) {
+            const message = 'Account does not exist'
+            const err = new Error(message)
+            err.clientMessage = message
+            err.statusCode = 400
+            return next(err)
+        }
+        //generate access token for the user
+        const user = { loginId };
+        const accessToken = generateForgetPasswordToken(user);
+        console.log(accessToken)
 
-//             const mailOptions = {
-//                 from: 'tanujatiwari444@gmail.com', // sender address
-//                 to: 'tanujatiwari04@gmail.com', // list of receivers
-//                 subject: 'Hello', // Subject line
-//                 text: 'Hello world?', // plain text body
-//                 html: '<b>Hello world?</b>' // html body
-//             };
-//             //daddu paaagalllllll
-//             //chitta daddu toa tappe
-//             //tap chitte daddu aa
-//             //hello, my name is zuzi
-//             // A zuzi with a zee
+        const tokenGenerationTime = Date.now()
+        const tokenExpirationTime = new Date(tokenGenerationTime + 10 * (60 * 60 * 1000))
+        const passwordResetLink = `http://localhost:3000/forget-password/${accessToken}`
+        //send email/mobile with password reset link
+        if (loginId.includes('@')) { //email
+            const subject = 'Your Myntra account password'
+            const body = `
+            <body>
+            <p>Dear customer,<br><br>
+                We received a request to reset the password for your account. If you made this request, please click the following button:<br><br>
+                <button><a href="${passwordResetLink}">Reset</a></button> <br><br>
+                Or <br><br> Open the following link in your browser:<br><br><a href="${passwordResetLink}">${passwordResetLink}<a/>
+            </p>
+            <br><br>
+            <p>The password reset link is valid till <strong>${tokenExpirationTime}<strong></p>
+            <br>
+            <p><strong>Please do not share this link with anyone.<strong></p>
+            <br>
+            <p>If you didn't raise this request, please ignore this email.</p>
+            </body>`
+            sendEmail(loginId, subject, body)
+            res.json({ 'message': `Email sent successfully to ${loginId}` })
+        }
+        else { //mobile number
+            await client.messages
+                .create({
+                    body: `Dear customer,\nWe received a request to reset the password for your account. If you made this request, open the following link in your browser: \n
+                    ${passwordResetLink}\nThe password reset link is valid till ${tokenExpirationTime}. \nPlease do not share this link with anyone.            
+                `,
+                    to: `+91${loginId}`,
+                    from: process.env.TWILIO_PHONE,
+                })
+            res.json({ 'message': `Password reset link successfully sent to ${loginId}` })
+        }
+    }
+    catch (err) {
+        console.log(err)
+        next(err)
+    }
+}
 
-//             transporter.sendMail(mailOptions, (error, info) => {
-//                 if (error) {
-//                     return console.log(error);
-//                 }
-//                 console.log('Message sent: %s', info.messageId);
-//                 res.send('email sent')
-//             });
-//         }
-//         else { //mobile number
-
-//         }
-//     }
-//     catch (err) {
-//         console.log(err)
-//         next(err)
-//     }
-// }
+module.exports.resetPassword = async (req, res, next) => {
+    try {
+        const { token } = req.params
+        const { password } = req.body
+        //validate the token
+        let loginId;
+        jwt.verify(token, process.env.FORGET_PASSWORD_ACCESS_TOKEN, async (err, user) => {
+            if (err) {
+                return res.status(403).json({ "message": "Invalid or expired token. Please login again." })
+            }
+            loginId = user.loginId
+        })
+        const bcryptRounds = 10
+        const hashedPassword = bcrypt.hashSync(password, bcryptRounds)
+        await query.resetPassword(loginId, hashedPassword)
+        res.json({ 'message': 'Password reset successfully!' })
+    }
+    catch (err) {
+        console.log(err)
+        next(err)
+    }
+}
 
 module.exports.logout = async (req, res, next) => {
     try {
@@ -285,8 +317,30 @@ module.exports.editProfile = async (req, res, next) => {
 
 module.exports.getCategoryProducts = async (req, res, next) => {
     try {
-        const productsObject = await query.getCategoryProducts();
-        res.json({ "data": productsObject.rows })
+        let { category } = req.params
+        let { page = 1 } = req.query
+        category = category.charAt(0).toUpperCase() + category.slice(1)
+        const [productsObject, countObject] = await Promise.all([query.getCategoryProducts(category, page), query.countProducts(category)])
+        const totalObjects = countObject.rows[0].count
+        const allProducts = productsObject.rows
+        for (let i = 0; i < allProducts.length; i++) {
+            allProducts[i].details = allProducts[i].details && convertStringToArray(allProducts[i].details)
+            allProducts[i].material_and_care = allProducts[i].material_and_care && convertStringToArray(allProducts[i].material_and_care)
+            allProducts[i].size = allProducts[i].size && convertStringToArray(allProducts[i].size)
+            allProducts[i].features = allProducts[i].features && convertStringToArray(allProducts[i].features)
+            allProducts[i].size_fit = allProducts[i].size_fit && convertStringToArray(allProducts[i].size_fit)
+            const imageObject = await query.getAllImages(allProducts[i].id)
+            allProducts[i].images = []
+            for (let j = 0; j < imageObject.rows.length; j++) {
+                allProducts[i].images.push(imageObject.rows[j].image_link)
+            }
+        }
+        const dataToSend = {
+            "count": totalObjects,
+            "page": page,
+            "data": productsObject.rows
+        }
+        res.json(dataToSend)
     }
     catch (err) {
         next(err)

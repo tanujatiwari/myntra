@@ -15,7 +15,9 @@ router.post('/signup', authenticateToken, controllers.createAccount)
 
 router.post('/logout', authenticateToken, controllers.logout)
 
-// router.post('/forgot', controllers.forgetPassword)
+router.post('/forgot', controllers.forgetPassword)
+
+router.post('/reset/:token', controllers.resetPassword)
 
 //user data route
 router.get('/profile', authenticateToken, controllers.profile)
