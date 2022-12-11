@@ -320,7 +320,7 @@ module.exports.getCategoryProducts = async (req, res, next) => {
         let { category } = req.params
         let { page = 1 } = req.query
         category = category.charAt(0).toUpperCase() + category.slice(1)
-        const [productsObject, countObject] = await Promise.all([query.getCategoryProducts(category, page), query.countProducts(category)])
+        const [productsObject, countObject] = await Promise.all([query.getCategoryProducts(category, page), query.countCategoryProducts(category)])
         const totalObjects = countObject.rows[0].count
         const allProducts = productsObject.rows
         for (let i = 0; i < allProducts.length; i++) {
@@ -349,18 +349,69 @@ module.exports.getCategoryProducts = async (req, res, next) => {
 
 module.exports.getSubcategoryProducts = async (req, res, next) => {
     try {
-        const productsObject = await query.getSubcategoryProducts();
-        res.json({ "data": productsObject.rows })
+        let { category, subcategory } = req.params
+        let { page = 1 } = req.query
+        category = category.charAt(0).toUpperCase() + category.slice(1)
+        subcategory = subcategory.split('_').join(' ')
+        subcategory = subcategory.charAt(0).toUpperCase() + subcategory.slice(1)
+        const [productsObject, countObject] = await Promise.all([query.getSubcategoryProducts(category, subcategory, page), query.countSubcategoryProducts(category, subcategory)])
+        const totalObjects = countObject.rows[0].count
+        const allProducts = productsObject.rows
+        for (let i = 0; i < allProducts.length; i++) {
+            allProducts[i].details = allProducts[i].details && convertStringToArray(allProducts[i].details)
+            allProducts[i].material_and_care = allProducts[i].material_and_care && convertStringToArray(allProducts[i].material_and_care)
+            allProducts[i].size = allProducts[i].size && convertStringToArray(allProducts[i].size)
+            allProducts[i].features = allProducts[i].features && convertStringToArray(allProducts[i].features)
+            allProducts[i].size_fit = allProducts[i].size_fit && convertStringToArray(allProducts[i].size_fit)
+            const imageObject = await query.getAllImages(allProducts[i].id)
+            allProducts[i].images = []
+            for (let j = 0; j < imageObject.rows.length; j++) {
+                allProducts[i].images.push(imageObject.rows[j].image_link)
+            }
+        }
+        const dataToSend = {
+            "count": totalObjects,
+            "page": page,
+            "data": productsObject.rows
+        }
+        res.json(dataToSend)
     }
     catch (err) {
+        console.log(err)
         next(err)
     }
 }
 
 module.exports.getProductTypeProduct = async (req, res, next) => {
     try {
-        const productsObject = await query.getProductTypeProduct();
-        res.json({ "data": productsObject.rows })
+        let { page = 1 } = req.query
+        let { category, subcategory, productType } = req.params
+        category = category.charAt(0).toUpperCase() + category.slice(1)
+        subcategory = subcategory.split('_').join(' ')
+        subcategory = subcategory.charAt(0).toUpperCase() + subcategory.slice(1)
+        productType = productType.split('_').join(' ')
+        productType = productType.charAt(0).toUpperCase() + productType.slice(1)
+        const [productsObject, countObject] = await Promise.all([query.getProductTypeProduct(category, subcategory, productType, page), query.countProductTypeProducts(category, subcategory, productType)])
+        const totalObjects = countObject.rows[0].count
+        const allProducts = productsObject.rows
+        for (let i = 0; i < allProducts.length; i++) {
+            allProducts[i].details = allProducts[i].details && convertStringToArray(allProducts[i].details)
+            allProducts[i].material_and_care = allProducts[i].material_and_care && convertStringToArray(allProducts[i].material_and_care)
+            allProducts[i].size = allProducts[i].size && convertStringToArray(allProducts[i].size)
+            allProducts[i].features = allProducts[i].features && convertStringToArray(allProducts[i].features)
+            allProducts[i].size_fit = allProducts[i].size_fit && convertStringToArray(allProducts[i].size_fit)
+            const imageObject = await query.getAllImages(allProducts[i].id)
+            allProducts[i].images = []
+            for (let j = 0; j < imageObject.rows.length; j++) {
+                allProducts[i].images.push(imageObject.rows[j].image_link)
+            }
+        }
+        const dataToSend = {
+            "count": totalObjects,
+            "page": page,
+            "data": productsObject.rows
+        }
+        res.json(dataToSend)
     }
     catch (err) {
         next(err)
@@ -369,8 +420,101 @@ module.exports.getProductTypeProduct = async (req, res, next) => {
 
 module.exports.getProduct = async (req, res, next) => {
     try {
-        const productsObject = await query.getProduct();
-        res.json({ "data": productsObject.rows })
+        let { category, subcategory, productType, productId } = req.params
+        category = category.charAt(0).toUpperCase() + category.slice(1)
+        subcategory = subcategory.split('_').join(' ')
+        subcategory = subcategory.charAt(0).toUpperCase() + subcategory.slice(1)
+        productType = productType.split('_').join(' ')
+        productType = productType.charAt(0).toUpperCase() + productType.slice(1)
+        const [productsObject] = await Promise.all([query.getProduct(category, subcategory, productType, productId)])
+        const product = productsObject.rows[0]
+        product.details = product.details && convertStringToArray(product.details)
+        product.material_and_care = product.material_and_care && convertStringToArray(product.material_and_care)
+        product.size = product.size && convertStringToArray(product.size)
+        product.features = product.features && convertStringToArray(product.features)
+        product.size_fit = product.size_fit && convertStringToArray(product.size_fit)
+        const imageObject = await query.getAllImages(product.id)
+        product.images = []
+        for (let j = 0; j < imageObject.rows.length; j++) {
+            product.images.push(imageObject.rows[j].image_link)
+        }
+        const dataToSend = {
+            "data": product
+        }
+        res.json(dataToSend)
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.getWishlist = async (req, res, next) => {
+    try {
+        const { userId } = req.user
+        const wishlistObject = await query.getWishlist(userId);
+        const allProducts = wishlistObject.rows
+        for (let i = 0; i < allProducts.length; i++) {
+            allProducts[i].details = allProducts[i].details && convertStringToArray(allProducts[i].details)
+            allProducts[i].material_and_care = allProducts[i].material_and_care && convertStringToArray(allProducts[i].material_and_care)
+            allProducts[i].size = allProducts[i].size && convertStringToArray(allProducts[i].size)
+            allProducts[i].features = allProducts[i].features && convertStringToArray(allProducts[i].features)
+            allProducts[i].size_fit = allProducts[i].size_fit && convertStringToArray(allProducts[i].size_fit)
+            const imageObject = await query.getAllImages(allProducts[i].id)
+            allProducts[i].images = []
+            for (let j = 0; j < imageObject.rows.length; j++) {
+                allProducts[i].images.push(imageObject.rows[j].image_link)
+            }
+        }
+        res.json(allProducts)
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.getBag = async (req, res, next) => {
+    try {
+        const { userId } = req.user
+        const userBagObject = await query.getUserBag(userId);
+        const allProducts = userBagObject.rows
+        for (let i = 0; i < allProducts.length; i++) {
+            allProducts[i].details = allProducts[i].details && convertStringToArray(allProducts[i].details)
+            allProducts[i].material_and_care = allProducts[i].material_and_care && convertStringToArray(allProducts[i].material_and_care)
+            allProducts[i].size = allProducts[i].size && convertStringToArray(allProducts[i].size)
+            allProducts[i].features = allProducts[i].features && convertStringToArray(allProducts[i].features)
+            allProducts[i].size_fit = allProducts[i].size_fit && convertStringToArray(allProducts[i].size_fit)
+            const imageObject = await query.getAllImages(allProducts[i].id)
+            allProducts[i].images = []
+            for (let j = 0; j < imageObject.rows.length; j++) {
+                allProducts[i].images.push(imageObject.rows[j].image_link)
+            }
+        }
+        res.json(allProducts)
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.addToWishlist = async (req, res, next) => {
+    try {
+        const { userId } = req.user
+        const { productId } = req.params
+        await query.addToWishlist(userId, productId);
+        res.status(201).json({ "message": "Added to wishlist!" })
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
+module.exports.addToBag = async (req, res, next) => {
+    try {
+        const { userId } = req.user
+        const { productId } = req.params
+        const { size } = req.query
+        await query.addToBag(userId, productId, size)
+        res.status(201).json({ "message": "Added to bag!" })
     }
     catch (err) {
         next(err)

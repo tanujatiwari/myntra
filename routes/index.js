@@ -42,9 +42,13 @@ router.get('/api/products/:category/:subcategory/:productType/:productId', contr
 
 //wishlist and bag
 
-router.post('/api/products/:category/:subcategory/:productType/:productId/wishlist')
+router.get('/my/wishlist', authenticateToken, controllers.getWishlist)
 
-router.post('/api/products/:category/:subcategory/:productType/:productId/bag')
+router.get('/my/bag', authenticateToken, controllers.getBag)
+
+router.post('/api/products/:productId/wishlist', authenticateToken, controllers.addToWishlist)
+
+router.post('/api/products/:productId/bag', authenticateToken, controllers.addToBag)
 
 router.use('*', controllers.notFound)
 

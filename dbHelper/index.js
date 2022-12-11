@@ -32,7 +32,7 @@ module.exports.editProfile = async (userId, name, email, gender, hintName, alter
     return await pool.query(`update users set full_name=$2, email=$3, gender=$4, hint_name=$5, alternate_mobile=$6, birth_date=$7, location=$8 where id=$1`, [userId, name, email, gender, hintName, alternateMobile, birthDate, location])
 }
 
-module.exports.countProducts = async (category) => {
+module.exports.countCategoryProducts = async (category) => {
     return await pool.query(`
     select count(*)
     from products
@@ -40,6 +40,28 @@ module.exports.countProducts = async (category) => {
     inner join subcategories on product_types.subcategory_id = subcategories.id
     inner join categories on categories.id = subcategories.category_id
     where categories.name=$1
+    `, [category])
+}
+
+module.exports.countSubcategoryProducts = async (category, subcategory) => {
+    return await pool.query(`
+    select count(*)
+    from products
+    inner join product_types on products.product_type_id = product_types.id 
+    inner join subcategories on product_types.subcategory_id = subcategories.id
+    inner join categories on categories.id = subcategories.category_id
+    where categories.name=$1 and subcategories.name ilike '${subcategory}'
+    `, [category])
+}
+
+module.exports.countProductTypeProducts = async (category, subcategory, productType) => {
+    return await pool.query(`
+    select count(*)
+    from products
+    inner join product_types on products.product_type_id = product_types.id 
+    inner join subcategories on product_types.subcategory_id = subcategories.id
+    inner join categories on categories.id = subcategories.category_id
+    where categories.name=$1 and subcategories.name ilike '%${subcategory}%' and product_types.name ilike '%${productType}%';
     `, [category])
 }
 
@@ -56,16 +78,42 @@ module.exports.getCategoryProducts = async (category, page) => {
     `, [category, page]);
 }
 
-module.exports.getSubcategoryProducts = async () => {
-    return await pool.query(`select * from products`);
+module.exports.getSubcategoryProducts = async (category, subcategory, page) => {
+    return await pool.query(`
+    select products.id, product_type_id, title, details, care_instructions, dominant_material, product_type, size_fit, brand, seller, ratings, no_of_ratings, material_and_care, discount, dominant_color, stock, price, compare_at_price, size, features, is_in_stock
+    ,subcategories.name as "subcategory", categories.name as "category"
+    from products
+    inner join product_types on products.product_type_id = product_types.id 
+    inner join subcategories on product_types.subcategory_id = subcategories.id
+    inner join categories on categories.id = subcategories.category_id
+    where categories.name=$1 and subcategories.name ilike '%${subcategory}%'
+    limit 20 offset $2
+    `, [category, page]);
 }
 
-module.exports.getProductTypeProduct = async () => {
-    return await pool.query(`select * from products`);
+module.exports.getProductTypeProduct = async (category, subcategory, productType, page) => {
+    return await pool.query(`
+    select products.id, product_type_id, title, details, care_instructions, dominant_material, product_type, size_fit, brand, seller, ratings, no_of_ratings, material_and_care, discount, dominant_color, stock, price, compare_at_price, size, features, is_in_stock
+    ,subcategories.name as "subcategory", categories.name as "category"
+    from products
+    inner join product_types on products.product_type_id = product_types.id 
+    inner join subcategories on product_types.subcategory_id = subcategories.id
+    inner join categories on categories.id = subcategories.category_id
+    where categories.name=$1 and subcategories.name ilike '%${subcategory}%' and product_types.name ilike '%${productType}%'
+    limit 20 offset $2
+    `, [category, page]);
 }
 
-module.exports.getProduct = async () => {
-    return await pool.query(`select * from products`);
+module.exports.getProduct = async (category, subcategory, productType, productId) => {
+    return await pool.query(`
+    select products.id, product_type_id, title, details, care_instructions, dominant_material, product_type, size_fit, brand, seller, ratings, no_of_ratings, material_and_care, discount, dominant_color, stock, price, compare_at_price, size, features, is_in_stock
+    ,subcategories.name as "subcategory", categories.name as "category"
+    from products
+    inner join product_types on products.product_type_id = product_types.id 
+    inner join subcategories on product_types.subcategory_id = subcategories.id
+    inner join categories on categories.id = subcategories.category_id
+    where categories.name=$1 and subcategories.name ilike '%${subcategory}%' and product_types.name ilike '%${productType}%' and products.id=$2
+    `, [category, productId]);
 }
 
 module.exports.findCategoryId = async (category) => {
@@ -98,6 +146,39 @@ module.exports.addProduct = async (brand, seller, ratings, noOfRatings, price, c
     return await pool.query(`insert into products("brand", "seller", "ratings", "no_of_ratings", "price", "compare_at_price", "size", "material_and_care", "dominant_material", "details", "features", "size_fit", "is_in_stock", "stock", "discount", "title", "product_type", "dominant_color", "product_type_id") values($1,$2,'${ratings}','${noOfRatings}','${price}','${comparePrice}',$3,$4,$5,$6,$7,$8,'${inStock}','${stock}','${discount}',$9,$10,$11,$12) returning id`, [brand, seller, size, materialAndCare, dominantMaterial, productDetails, features, sizeFit, title, productType, color, subSubCategoryId]);
 }
 
-module.exports.getAllImages = async (productId) =>{
-    return await pool.query(`select id, product_id, image_link from images where product_id=$1`,[productId])
+module.exports.getAllImages = async (productId) => {
+    return await pool.query(`select id, product_id, image_link from images where product_id=$1`, [productId])
+}
+
+module.exports.addToWishlist = async (userId, productId) => {
+    return await pool.query(`insert into wishlist(user_id, product_id) values($1,$2)`, [userId, productId])
+}
+
+module.exports.addToBag = async (user, productId, size) => {
+    return await pool.query(`insert into bag(user_id,product_id, size) values($1,$2,$3)`, [user, productId, size])
+}
+
+module.exports.getWishlist = async (userId) => {
+    return await pool.query(`
+    select products.id, product_type_id, title, details, care_instructions, dominant_material, product_type, size_fit, brand, seller, ratings, no_of_ratings, material_and_care, discount, dominant_color, stock, price, compare_at_price, size, features, is_in_stock
+    ,subcategories.name as "subcategory", categories.name as "category"
+    from products
+    inner join product_types on products.product_type_id = product_types.id 
+    inner join subcategories on product_types.subcategory_id = subcategories.id
+    inner join categories on categories.id = subcategories.category_id
+    inner join wishlist on products.id = wishlist.product_id
+    where wishlist.user_id = $1
+    `, [userId])
+}
+module.exports.getUserBag = async (userId) =>{
+    return await pool.query(`
+    select products.id, product_type_id, title, details, care_instructions, dominant_material, product_type, size_fit, brand, seller, ratings, no_of_ratings, material_and_care, discount, dominant_color, stock, price, compare_at_price, products.size, features, is_in_stock
+    ,subcategories.name as "subcategory", categories.name as "category", bag.size as "user_selected_size"
+    from products
+    inner join product_types on products.product_type_id = product_types.id 
+    inner join subcategories on product_types.subcategory_id = subcategories.id
+    inner join categories on categories.id = subcategories.category_id
+    inner join bag on products.id = bag.product_id
+    where bag.user_id = $1
+    `, [userId])
 }
